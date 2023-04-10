@@ -1,15 +1,38 @@
 import React, { useEffect, useState} from 'react'
-import {View, Text, Image, TouchableOpacity, ActivityIndicator} from 'react-native'
+import {View, Text, Image, TouchableOpacity} from 'react-native'
 import styles from './styles'
-import { Ionicons } from '@expo/vector-icons';
-import { Sound } from "expo-av/build/Audio/Sound";
+import { Ionicons, AntDesign } from '@expo/vector-icons';
+import {Sound} from "expo-av/build/Audio/Sound";
+import { Audio} from 'expo-av'
 
-const PlayerWidget = ({sound, setSound}) =>  {
+// const song ={
+//     id: '1',
+//     uri: 'https://p.scdn.co/mp3-preview/1d53b96abb564f9ba08427c3c5361dd8fbe72f7d?cid=d8a5ed958d274c2e8ee717e6a4b0971d',
+//     imageUri: 'https://images.genius.com/fafcc0242f48734290ed600204a13b9b.1000x1000x1.png',
+//     title: 'Wap',
+//     artist: 'Cardi B'
+// }
+
+
+const PlayerWidget = ({data}) =>  {
+  const [sound, setSound] = useState<Sound|null>(null)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [duration, setDuration] = useState<number|null>(null)
   const [position, setPosition] = useState<number|null>(null)
 
-    const onPlayBackStatusUpdate = (status) => {
+  console.log(data?.result)
+
+  // const [song, setSong] = useState({})
+
+  // setSong({
+  //   id: "",
+  //   title: "",
+  //   artist: "",
+  //   uri: "",
+  //   imageUri: "",
+  // })
+  return ''
+  const onPlayBackStatusUpdate = (status) =>{
     setIsPlaying(status.isPlaying);
     setDuration(status.durationMillis)
     setPosition(status.positionMillis)
@@ -19,7 +42,7 @@ const PlayerWidget = ({sound, setSound}) =>  {
       await sound.unloadAsync();
     }
     const {sound: newSound } = await Sound.createAsync(
-      { uri: sound?.uri },
+      { uri: song.uri },
       { shouldPlay: isPlaying },
       onPlayBackStatusUpdate
     )
@@ -27,24 +50,23 @@ const PlayerWidget = ({sound, setSound}) =>  {
   }
 
   useEffect(() =>{
-      playCurrentSong();
+    playCurrentSong();
   },[])
 
   const onPlayPausePress = async () => {
     if(!sound){
-    return;
+      return;
     }
     if(isPlaying){
-        await sound.stopAsync();
+      await sound.stopAsync();
     }else {
-        console.log("This is the sound bro:::", sound)
-        await sound?.uri.playAsync();
+      await sound.playAsync();
     }
   }
 
   const getProgress = () =>{
     if(sound === null || position === null || duration === null){
-        return 0;
+      return 0;
     }
     return(position / duration ) * 100;
   }
@@ -52,21 +74,21 @@ const PlayerWidget = ({sound, setSound}) =>  {
   return (
     <View>
       <View style={styles.container}>
-          <View style={{flex: 1}}>
-              <Image source={{uri: sound?.images[0]?.url}} style={styles.image} />
-          </View>
-          <View style={styles.mid__container}>
-              <Text style={styles.title}>{sound?.name}</Text>
-              <Text style={styles.artist}>{sound?.artists[0].name}</Text>
-          </View>
-          <View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
-            <TouchableOpacity onPress={onPlayPausePress}>
-                <Ionicons style={{marginHorizontal: 10}} name={isPlaying ? 'pause-outline' : 'play-outline'} size={20} color="#3d1f48" />
-            </TouchableOpacity>
-          </View>
+        <View style={{flex: 1}}>
+          <Image source={{uri: song.imageUri}} style={styles.image} />
+        </View>
+        <View style={styles.mid__container}>
+          <Text style={styles.title}>{song.title}</Text>
+          <Text style={styles.artist}>{song.artist}</Text>
+        </View>
+        <View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>
+          <TouchableOpacity onPress={onPlayPausePress}>
+            <Ionicons style={{marginHorizontal: 10}} name={isPlaying ? 'pause-outline' : 'play-outline'} size={20} color="#3d1f48" />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={{width: '95%', alignItems: 'center'}}>
-          <View style={[styles.progress,{width: `${getProgress()}%`}]} />
+        <View style={[styles.progress,{width: `${getProgress()}%`}]} />
       </View>
     </View>
   )

@@ -1,22 +1,26 @@
 import React, { useEffect } from 'react'
 import { View, Text, StyleSheet, Image, ActivityIndicator} from 'react-native'
 import {useRoute} from '@react-navigation/native'
-import Lyrix from '../components/lyrix/Lyrix';
-
+import { useGetSongDetailsQuery } from '../redux/services/shazam'
+import PlayerWidget from '../components/PlayerWidget';
 function AlbumScreen() {
   const route = useRoute();
   const { params } = route;
+  const {id} = params
+  const {data, isFetching, error} = useGetSongDetailsQuery(id);
 
+  if(!data || isFetching) return <ActivityIndicator />
   return (
     <View>
       <View style={styles.container}>
-        <Image source={{uri: params?.data?.images[0]?.url}} style={styles.album__image} />
+        <Image source={{uri: data?.result?.images?.coverart}} style={styles.album__image} />
         <View style={styles.textContainer}>
-          <Text style={styles.title}>{params?.data?.name}</Text>
-          <Text style={styles.subtitle}>{params?.data?.artists[0]?.name}</Text>
+          <Text style={styles.title}>{data?.result?.title}</Text>
+          <Text style={styles.subtitle}>{data?.result?.title?.slice(0, 30) + "..."}</Text>
+          <Text style={styles.subtitle}>{data?.result?.subtitle}</Text>
         </View>
       </View>
-      {/* <Lyrix data={params?.data}/> */}
+      {/* <PlayerWidget data={data} /> */}
     </View>
   )
 }

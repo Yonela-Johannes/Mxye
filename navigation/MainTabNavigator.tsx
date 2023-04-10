@@ -5,8 +5,10 @@ import * as React from 'react';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import { MainTabParamList } from '../types';
-import { Entypo } from '@expo/vector-icons'
+import { Entypo, MaterialIcons } from '@expo/vector-icons'
 import MusicScreen from '../Screens/MusicScreen'
+import VideoScreen from '../Screens/VideoScreen';
+import VideoDetailsScreen from '../Screens/VideoDetailsScreen';
 
 
 
@@ -18,7 +20,7 @@ export default function MainTabNavigator() {
 
   return (
     <mainTab.Navigator
-      initialRouteName="Chambers"
+      initialRouteName="Music"
       tabBarOptions={{
          activeTintColor: Colors[colorScheme].background,
          style: {
@@ -34,6 +36,14 @@ export default function MainTabNavigator() {
         component={MusicScreen}
         options={{
           tabBarIcon: ({ color: string }) => <Entypo name="folder-music" size={21} color="#367f86" />,
+          tabBarLabel: () => null
+        }}
+      />
+      <mainTab.Screen
+        name="Videos"
+        component={VideoScreen}
+        options={{
+          tabBarIcon: ({ color: string }) => <MaterialIcons name="video-collection" size={23} color="#367f86" />,
           tabBarLabel: () => null
         }}
       />

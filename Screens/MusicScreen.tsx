@@ -8,24 +8,19 @@ import PlayerWidget from '../components/PlayerWidget';
 
 const MusicScreen = () => {
   const {data, isFetching, error} = useGetSongsByCountryQuery();
-  const [sound, setSound] = useState<Sound|null>(null)
-  const { activeSong, isPlaying } = useSelector((state) => state.player);
   if (isFetching && !data) return <ActivityIndicator />
   if(error) return <Error />
     return (
       <View style={styles.container}>
           <FlatList
-            data={data?.albums?.items}
+            data={data?.result.tracks}
             renderItem={(music) => (
               <Album
                 music={music}
-                sound={sound}
-                setSound={setSound}
               />
             )}
-            keyExtractor={(key) => key?.id}
+            keyExtractor={(key) => key?.key}
           />
-          <PlayerWidget sound={sound} setSound={setSound} />
       </View>
     )
 }

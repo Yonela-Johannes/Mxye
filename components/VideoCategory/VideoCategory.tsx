@@ -1,22 +1,24 @@
-import React from 'react'
-import {Image, StyleSheet, View, TouchableOpacity, Text, ActivityIndicator} from 'react-native'
-import { AlbumSingle } from '../../types'
-import { useNavigation } from '@react-navigation/native'
+import React from 'react';
+import { View, Text, Image, StyleSheet, FlatList, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const Album = ({ music }) => {
+
+export default function VideoCategory({video}) {
   const navigation = useNavigation();
-  const onPressHandler = (key) => {
-    navigation.navigate('AlbumScreen', {id: key})
+
+  const onPressHandler = (id) =>{
+    navigation.navigate('VideoScreen', {id: id})
   }
+
   return (
-    <TouchableOpacity onPress={() => onPressHandler(music?.item?.key)} style={styles.container}>
-      <Image style={styles.album__image} source={{uri: music?.item?.images?.coverart}} />
+    <TouchableOpacity onPress={() => onPressHandler(video?.video_id)} style={styles.container}>
+      <Image style={styles.album__image} source={{uri: video?.thumbnails[0].url}} />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{music?.item?.title?.slice(0, 30) + "..."}</Text>
-        <Text style={styles.subtitle}>{music?.item.subtitle}</Text>
+        <Text style={styles.title}>{video?.title?.slice(0, 30) + "..."}</Text>
+        <Text style={styles.subtitle}>{video?.author}</Text>
       </View>
     </TouchableOpacity>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -66,4 +68,3 @@ const styles = StyleSheet.create({
 
   }
 })
-export default Album
