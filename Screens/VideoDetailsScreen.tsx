@@ -1,9 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Pressable, ActivityIndicator } from 'react-native';
-import videos from '../data/videos'
-import { useGetVideoStreamQuery } from '../redux/services/shazam'
+import { useGetVideoStreamQuery, useGetVideoDetailsQuery } from '../redux/services/shazam'
 import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
-const firstVideo = videos.videos.items[0]
 import { ResizeMode } from 'expo-av'
 import VideoPlayer from 'expo-video-player'
 
@@ -12,99 +10,97 @@ import {useRoute} from '@react-navigation/native'
 const VideoDetailsScreen = () =>  {
   const route = useRoute();
   const { params } = route;
+  const { id } = params
+  const {data, isFetching, error} = useGetVideoDetailsQuery(id);
+  const {data: streamData, isFetching: fetching} = useGetVideoStreamQuery(id);
 
-  const headers = new Headers({
-    'Accept': 'application/json',
-    'Origin': 'https://youtube-v2.p.rapidapi.com',
-    'X-RapidAPI-Key': '34ae51b724mshdb30bf885ce3511p1e8f90jsn61649cfcf55f'
-  });
 
-  const url = `https://youtube-v2.p.rapidapi.com/video/details/?id=hs1W2KQluWA`
-  const request = new Request(url, {
-    method: 'GET',
-    headers: headers,
-    mode: 'cors',
-    credentials: 'include'
-  });
+  console.log("This is the data my brother:: ",data)
 
-  fetch(request)
-    .then(response => {
-      console.log("This is the response!!")
-      console.log(response)
-    })
-    .then(data => console.log(data))
-    .catch(error => {
-      // handle error
-    });
+  console.log(data)
+  const video = {
+    id: data?.videoId,
+    title: data?.title,
+    name: data?.author.title,
+    duration: data?.lengthSeconds,
+    poster: data?.thumbnails[0].url,
+    description: data?.description,
+    thumbnail: data?.author.avatar[0].url,
+    videoUri: !streamData?.isProtectedContent ? streamData?.formats[0].url : '',
+    likes: String(data?.stats?.likes),
+    views: String(data?.stats?.views),
+    shares: String(data?.stats.comments)
+  }
 
-  return <ActivityIndicator />
-  const minutes = Math.floor(firstVideo.duration / 60);
-  const seconds = firstVideo.duration / 60;
+  console.log("This is the vids brother", video)
 
-  let viewsString = firstVideo.views.toString();
-  if(firstVideo.views >= 1000000){
-    viewsString = (firstVideo.views / 1000).toFixed(1) + 'm'
-  }else if(firstVideo.views >= 1000){
-    viewsString = (firstVideo.views / 1000).toFixed(1) + 'k'
-  }else if(firstVideo.views >= 100){
-    viewsString = (firstVideo.views / 100).toPrecision(1) + 'h'}
+  const minutes = Math.floor(video.duration / 60);
+  const seconds = video.duration / 60;
 
-  let followString = videos.follow.toString();
-  if(videos.follow >= 1000000){
-    followString = (videos.follow / 1000).toFixed(1) + 'm'
-  }else if(videos.follow >= 1000){
-    followString = (videos.follow / 1000).toFixed(1) + 'k'
-  }else if(videos.follow >= 100){
-    followString = (videos.follow / 100).toPrecision(1) + 'h'}
+  let viewsString = video?.views;
+  if(video.views >= 1000000){
+    viewsString = (video.views / 1000).toFixed(1) + 'm'
+  }else if(video.views >= 1000){
+    viewsString = (video.views / 1000).toFixed(1) + 'k'
+  }else if(video.views >= 100){
+    viewsString = (video.views / 100).toPrecision(1) + 'h'
+  }
 
+
+  let followString = video?.likes;
+  if(video?.likes >= 1000000){
+    followString = (video?.likes / 1000).toFixed(1) + 'm'
+  }else if(video?.likes >= 1000){
+    followString = (video?.likes / 1000).toFixed(1) + 'k'
+  }else if(video?.likes >= 100){
+    followString = (video?.likes / 100).toPrecision(1) + 'h'
+  }
 
   return (
     <View style={styles.container}>
       <View>
-      <VideoPlayer
-          videoProps={{
-            shouldPlay: true,
-            resizeMode: ResizeMode.CONTAIN,
-            source: {
-              uri: data?.formats[0].url,
-            },
-          }}
-        />
+        {/* <VideoPlayer
+            videoProps={{
+              shouldPlay: true,
+              resizeMode: ResizeMode.CONTAIN,
+              source: {
+                uri: video?.videoUri
+              },
+            }}
+          /> */}
       </View>
-        <Image style={styles.poster} source={{uri: firstVideo.poster}}/>
+        <Image style={styles.poster} source={{uri: video.poster}}/>
         <Text style={styles.duration}>{minutes}:{seconds < 10 ? '0' : ''}</Text>
         <View style={styles.infoContainer}>
           <View style={{alignItems: 'center', justifyContent: 'center', padding: 5}}>
-            <Image style={styles.thumbnail} source={{uri: firstVideo.thumbnail}}/>
-            <Text style={styles.name}>{videos.name}</Text>
-            <Text style={styles.followers}>{followString} <Ionicons name="md-add-circle-outline" size={16} color="black" />
-            </Text>
+            <Image style={styles.thumbnail} source={{uri: video.thumbnail}}/>
+            <Text style={styles.name}>{video.name}</Text>
+            <Text style={styles.followers}>{followString}</Text>
           </View>
-          <View style={{padding: 10}}>
-            <Text style={styles.description}>{videos.title}</Text>
-            <Text style={styles.description}>{viewsString} plays</Text>
-            <Text style={styles.description}>{videos.year}</Text>
-            {/* <Text style={styles.description}>{firstVideo.description}</Text> */}
-          </View>
-          <View style={styles.iconsContainer}>
-            <Pressable style={{alignItems: 'center'}}>
-              <AntDesign name="like2" size={18} color="gray" />
-              <Text style={styles.count}>{firstVideo.likes}</Text>
-            </Pressable>
-            <Pressable style={{alignItems: 'center'}}>
-              <AntDesign name="hearto" size={18} color="gray" />
-              <Text style={styles.count}>{firstVideo.loves}</Text>
-            </Pressable>
-            <Pressable style={{alignItems: 'center'}}>
-              <Feather name="download" size={18} color="gray" />
-              <Text style={styles.count}>{firstVideo.downloads}</Text>
-            </Pressable>
-            <Pressable style={{alignItems: 'center'}}>
-              <Ionicons name="share-outline" size={18} color="gray" />
-              <Text style={styles.count}>{firstVideo.shares}</Text>
-            </Pressable>
+          <View>
+            <View style={styles.iconsContainer}>
+              <Pressable style={{alignItems: 'center'}}>
+                <AntDesign name="like2" size={18} color="gray" />
+                <Text style={styles.count}>{video.likes}</Text>
+              </Pressable>
+              <Pressable style={{alignItems: 'center'}}>
+                <Feather name="download" size={18} color="gray" />
+                <Text style={styles.count}>{video.views}</Text>
+              </Pressable>
+              <Pressable style={{alignItems: 'center'}}>
+                <Ionicons name="share-outline" size={18} color="gray" />
+                <Text style={styles.count}>{video.shares}</Text>
+              </Pressable>
+            </View>
+            <View style={{padding: 10}}>
+              <Text style={styles.description}>{video.title?.slice(0, 30) + "..."}</Text>
+              <Text style={styles.description}>{viewsString} plays</Text>
+            </View>
           </View>
       </View>
+      {streamData?.isProtectedContent && (
+        <Text style={styles.error}>The video is unable to load. We are sorry</Text>
+      )}
     </View>
   );
 };
@@ -115,12 +111,11 @@ const styles = StyleSheet.create({
     },
     poster: {
         width: "100%",
-        aspectRatio: 16/9,
-        resizeMode: 'cover'
+        height: 400,
+        resizeMode: "cover",
     },
     infoContainer: {
       flexDirection: 'row',
-      backgroundColor: '#49274b',
       alignItems: 'center',
     },
     thumbnail: {
@@ -147,6 +142,13 @@ const styles = StyleSheet.create({
       fontSize: 12,
       fontWeight: 'bold',
       padding: 5,
+    },
+    error: {
+      color: '#367f86',
+      fontSize: 11,
+      fontWeight: 'bold',
+      padding: 5,
+      textAlign: "center"
     },
     followers: {
       marginLeft: 10,

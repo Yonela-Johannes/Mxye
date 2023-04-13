@@ -3,35 +3,24 @@ import {View, Text, Image, TouchableOpacity} from 'react-native'
 import styles from './styles'
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import {Sound} from "expo-av/build/Audio/Sound";
-import { Audio} from 'expo-av'
-
-// const song ={
-//     id: '1',
-//     uri: 'https://p.scdn.co/mp3-preview/1d53b96abb564f9ba08427c3c5361dd8fbe72f7d?cid=d8a5ed958d274c2e8ee717e6a4b0971d',
-//     imageUri: 'https://images.genius.com/fafcc0242f48734290ed600204a13b9b.1000x1000x1.png',
-//     title: 'Wap',
-//     artist: 'Cardi B'
-// }
-
 
 const PlayerWidget = ({data}) =>  {
   const [sound, setSound] = useState<Sound|null>(null)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [duration, setDuration] = useState<number|null>(null)
   const [position, setPosition] = useState<number|null>(null)
+  let song;
+  if(!song){
+    song =
+      {
+        id: data?.tracks[0].id,
+        title: data?.tracks[0]?.title,
+        artist: data?.tracks[0]?.artists[0].name,
+        uri: data?.tracks[0].preview_url,
+        imageUri: data?.tracks[0]?.album.images[0].url
+      }
+  }
 
-  console.log(data?.result)
-
-  // const [song, setSong] = useState({})
-
-  // setSong({
-  //   id: "",
-  //   title: "",
-  //   artist: "",
-  //   uri: "",
-  //   imageUri: "",
-  // })
-  return ''
   const onPlayBackStatusUpdate = (status) =>{
     setIsPlaying(status.isPlaying);
     setDuration(status.durationMillis)
@@ -39,7 +28,10 @@ const PlayerWidget = ({data}) =>  {
   }
   const playCurrentSong = async () => {
     if(sound){
+      await sound.stopAsync();
       await sound.unloadAsync();
+    }else{
+
     }
     const {sound: newSound } = await Sound.createAsync(
       { uri: song.uri },
@@ -60,6 +52,7 @@ const PlayerWidget = ({data}) =>  {
     if(isPlaying){
       await sound.stopAsync();
     }else {
+      await sound.stopAsync();
       await sound.playAsync();
     }
   }
@@ -75,10 +68,10 @@ const PlayerWidget = ({data}) =>  {
     <View>
       <View style={styles.container}>
         <View style={{flex: 1}}>
-          <Image source={{uri: song.imageUri}} style={styles.image} />
+          <Image source={{uri: song?.imageUri}} style={styles.image} />
         </View>
         <View style={styles.mid__container}>
-          <Text style={styles.title}>{song.title}</Text>
+          <Text style={styles.title}>{song?.title}</Text>
           <Text style={styles.artist}>{song.artist}</Text>
         </View>
         <View style={{flexDirection: 'row', marginRight: 5, alignItems: 'center'}}>

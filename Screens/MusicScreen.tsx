@@ -13,13 +13,13 @@ const MusicScreen = () => {
     return (
       <View style={styles.container}>
           <FlatList
-            data={data?.result.tracks}
+            data={data?.tracks.items}
             renderItem={(music) => (
               <Album
                 music={music}
               />
             )}
-            keyExtractor={(key) => key?.key}
+            keyExtractor={(key) => key?.data.id}
           />
       </View>
     )

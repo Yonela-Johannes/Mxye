@@ -8,12 +8,13 @@ const Album = ({ music }) => {
   const onPressHandler = (key) => {
     navigation.navigate('AlbumScreen', {id: key})
   }
+
   return (
-    <TouchableOpacity onPress={() => onPressHandler(music?.item?.key)} style={styles.container}>
-      <Image style={styles.album__image} source={{uri: music?.item?.images?.coverart}} />
+    <TouchableOpacity onPress={() => onPressHandler(music?.item.data.id)} style={styles.container}>
+      <Image style={styles.album__image} source={{uri: music?.item.data?.albumOfTrack?.coverArt.sources[0].url}} />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{music?.item?.title?.slice(0, 30) + "..."}</Text>
-        <Text style={styles.subtitle}>{music?.item.subtitle}</Text>
+        <Text style={styles.title}>{music?.item.data?.name?.slice(0, 30) + "..."}</Text>
+        <Text style={styles.subtitle}>{music?.item.data.artists.items[0].profile["name"]}</Text>
       </View>
     </TouchableOpacity>
   )

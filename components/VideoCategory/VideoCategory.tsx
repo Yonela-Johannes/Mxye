@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, FlatList, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 
 export default function VideoCategory({video}) {
   const navigation = useNavigation();
@@ -11,11 +10,11 @@ export default function VideoCategory({video}) {
   }
 
   return (
-    <TouchableOpacity onPress={() => onPressHandler(video?.video_id)} style={styles.container}>
-      <Image style={styles.album__image} source={{uri: video?.thumbnails[0].url}} />
+    <TouchableOpacity onPress={() => onPressHandler(video?.video.videoId)} style={styles.container}>
+      <Image style={styles.album__image} source={{uri: video?.video.thumbnails[0].url}} />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{video?.title?.slice(0, 30) + "..."}</Text>
-        <Text style={styles.subtitle}>{video?.author}</Text>
+        <Text style={styles.title}>{video?.video.title?.slice(0, 30) + "..."}</Text>
+        <Text style={styles.subtitle}>{video?.video.author.title}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -47,8 +46,8 @@ const styles = StyleSheet.create({
     color: 'grey',
   },
   album__image : {
-      width: 70,
-      height: 70,
+      width: 120,
+      height: 100,
       borderRadius: 5,
   },
   headline: {

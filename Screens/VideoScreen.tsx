@@ -1,16 +1,18 @@
-import React,{useState} from 'react'
+import React from 'react'
 import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native'
-import Categories from '../data/Catergories'
+import Error from '../components/Error';
 import VideoCategory from '../components/VideoCategory/VideoCategory'
 import { useGetVideosByCountryQuery } from '../redux/services/shazam'
 
 function VideoScreen() {
   const {data, isFetching, error} = useGetVideosByCountryQuery();
+  console.log(data)
+  if(error) return <Error title="Videos not loaded" />
   if (isFetching && !data) return <ActivityIndicator />
   return (
     <View style={styles.container}>
       <FlatList
-        data={data?.videos}
+        data={data?.contents}
         renderItem={({ item }) => (
           <VideoCategory
             video={item}

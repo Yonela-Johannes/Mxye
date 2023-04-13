@@ -20,7 +20,7 @@ export default function MainTabNavigator() {
 
   return (
     <mainTab.Navigator
-      initialRouteName="Music"
+      initialRouteName="Videos"
       tabBarOptions={{
          activeTintColor: Colors[colorScheme].background,
          style: {
